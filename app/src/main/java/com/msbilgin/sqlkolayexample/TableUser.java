@@ -9,13 +9,13 @@ import com.msbilgin.sqlkolay.Table;
 public class TableUser extends Table {
     private static final String tableName = "USERS";
 
-    @Column(type = Column.Type.INTEGER)
+    @Column(type = Column.Type.INT)
     private Column uid;
 
     private Column name;
     private Column surname;
 
-    @Column(type = Column.Type.INTEGER)
+    @Column(type = Column.Type.INT)
     private Column age;
 
     @Column(type = Column.Type.REAL)
