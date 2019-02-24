@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
-group = 'com.github.MSBilgin'
-version = '0.2'
+group = 'com.msbilgin.sqlkolay'
+version = '0.3'
 
 android {
     compileSdkVersion 28
