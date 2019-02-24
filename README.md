@@ -65,7 +65,7 @@ Thats all...
 
 Installation
 --------
-On project's build.gradle
+on project's build.gradle
 ```groovy
 allprojects {
     repositories {
@@ -75,7 +75,7 @@ allprojects {
     }
 }
 ```
-On app's build.gradle
+on app's build.gradle
 ```groovy
 dependencies {
     implementation 'com.github.msbilgin:sqlkolay:0.3'
