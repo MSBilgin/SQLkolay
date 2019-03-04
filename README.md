@@ -1,6 +1,6 @@
 # SQLkolay
 
-Android library that simplifies working on SQLite database.
+Android library that simplifies working with SQLite database.
 
 Usage
 =====
