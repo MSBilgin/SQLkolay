@@ -8,59 +8,71 @@ Database Class
 
 ``` java
 public class AppDB extends SQLkolay {
-    private static final String databaseName = "database";
-    private static final int version = 14;
+    private static final String databaseName = "app.db";
+    private static final int version = 1;
 
-    public static TableUser user = new TableUser();
+    public TableBooks books = new TableBooks();
 
     public AppDB(Context context) {
         super(context, databaseName, version);
+        registerTables(books);
     }
 }
 ```
 Table Class
 
 ``` java
-public class TableUser extends Table {
-    private static final String tableName = "USERS";
+public class TableBooks extends Table {
+    private static final String tableName = "BOOKS";
 
-    @Column(type = Column.Type.INTEGER)
-    private Column uid;
+    @Column(type = Column.Type.INTEGER_AUTOINC, primary = true)
+    private Column id;
 
     private Column name;
-    private Column surname;
+    private Column author;
 
-    @Column(type = Column.Type.INTEGER)
-    private Column age;
+    @Column(type = Column.Type.NUMBER)
+    private Column date;
 
     @Column(type = Column.Type.REAL)
-    private Column income;
+    private Column price;
 
-    public TableUser() {
+    public TableBooks() {
         super(tableName);
     }
 
-    public void add(User user) {
+    public void add(Book book) {
         ContentValues values = new ContentValues();
-        values.put("uid", user.uid);
-        values.put("name", user.name);
-        values.put("surname", user.surname);
-        values.put("age", user.age);
-        values.put("income", user.income);
+        values.put("name", book.name);
+        values.put("author", book.author);
+        values.put("date", book.publishDate);
+        values.put("price", book.price);
         insert(null, values);
     }
 
-    public void remove(long uid) {
-        delete("uid=?", new String[]{String.valueOf(uid)});
-    }   
+    public Book getByID(int id) {
+        Book book = new Book();
+
+        String sql = String.format("select * from %s where id=%s", tableName, id);
+        Cursor cursor = getDB().rawQuery(sql, null);
+        if (cursor.moveToFirst()) {
+            book.id = cursor.getInt(cursor.getColumnIndex("id"));
+            book.name = cursor.getString(cursor.getColumnIndex("name"));
+            book.author = cursor.getString(cursor.getColumnIndex("author"));
+            book.price = cursor.getDouble(cursor.getColumnIndex("price"));
+            book.publishDate = cursor.getString(cursor.getColumnIndex("date"));
+        }
+        return book;
+    }
+
 }
 ```
 Thats all...
 
 ``` java
     AppDB appDB = new AppDB(getApplicationContext());
-    User user1 = new User(111,"Mehmet Selim", "Bilgin", 29,100000);
-    appDB.user.add(user1);
+    Book book = new Book("Seyahatname", "Evliya Çelebi", "01.01.1600", 2000);
+    appDB.books.add(book);
 ```
 
 Installation
