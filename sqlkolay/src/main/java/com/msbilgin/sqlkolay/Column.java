@@ -8,20 +8,14 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Column {
-    enum Type {TEXT, NUM, INT, INT_AUTOINC, REAL, BLOB}
-
-    enum PrimaryKey {True, False}
-
-    enum Unique {True, False}
-
-    enum NotNull {True, False}
+    enum Type {TEXT, INTEGER, REAL, NUMBER, BLOB, INTEGER_AUTOINC}
 
     Type type() default Type.TEXT;
 
-    PrimaryKey primary() default PrimaryKey.False;
+    boolean primary() default false;
 
-    Unique unique() default Unique.False;
+    boolean unique() default false;
 
-    NotNull notNull() default NotNull.True;
+    boolean notNull() default false;
 }
 

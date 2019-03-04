@@ -3,6 +3,7 @@ package com.msbilgin.sqlkolay;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -10,50 +11,60 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class SQLkolay {
+    private final int version;
+    private final String databaseName;
+    private final Context context;
+
+    private boolean isRegistered = false;
 
     public SQLkolay(Context context, String databaseName, int version) {
-        List<Table> tables = getTables();
-        Sqlite sqlite = new Sqlite(context, databaseName, version, tables);
-        SQLiteDatabase sqLiteDatabase = sqlite.getWritableDatabase();
-        for (Table table : tables) {
+        this.context = context;
+        this.databaseName = databaseName;
+        this.version = version;
+    }
+
+    protected void registerTables(Table... tables) {
+        if (isRegistered) {
+            Log.w("SQLkolay", "registerTables can be called only one time");
+            return;
+        }
+
+        boolean calledConstructer = false;
+        StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+        for (StackTraceElement traceElement : stackTraceElements) {
+            calledConstructer = traceElement.getMethodName().equals("<init>") ? true : calledConstructer;
+        }
+
+        if (!calledConstructer) {
+            Log.w("SQLkolay", "registerTables can be called only in constructer");
+            return;
+        }
+
+        SqliteDB sqliteDB = new SqliteDB(context, databaseName, version, tables);
+        SQLiteDatabase sqLiteDatabase = sqliteDB.getWritableDatabase();
+
+        for (int i = 0; i < tables.length; i++) {
             try {
-                Class tableClass = table.getClass().getSuperclass();
+                Class tableClass = tables[i].getClass().getSuperclass();
                 Method method = tableClass.getDeclaredMethod("setDB", SQLiteDatabase.class);
                 method.setAccessible(true);
-                method.invoke(table,sqLiteDatabase);
+                method.invoke(tables[i], sqLiteDatabase);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
+        isRegistered = true;
     }
 
-    /**
-     * {@link Table} tipindeki nesnelerin listesini getirir.
-     *
-     * @return Table listesi
-     */
-    private List<Table> getTables() {
-        List<Table> tables = new ArrayList<>();
-        for (Field field : this.getClass().getDeclaredFields()) {
-            if (Table.class.isAssignableFrom(field.getType())) {
-                try {
-                    tables.add((Table) field.get(this));
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return tables;
-    }
 
     /**
-     * SQLite sınıfı
+     * SQLite class
      */
-    private class Sqlite extends SQLiteOpenHelper {
-        private List<Table> tables;
+    private class SqliteDB extends SQLiteOpenHelper {
+        private Table[] tables;
 
-        Sqlite(Context context, String name, int version, List<Table> tables) {
+        SqliteDB(Context context, String name, int version, Table[] tables) {
             super(context, name, null, version);
             this.tables = tables;
         }
@@ -70,7 +81,6 @@ public abstract class SQLkolay {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
             }
         }
 

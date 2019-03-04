@@ -18,18 +18,41 @@ public abstract class Table {
     }
 
     private String sqlCreate() {
-        List<String> columns = new ArrayList<>();
+        List<String> columnDefinitions = new ArrayList<>();
 
         for (Field field : this.getClass().getDeclaredFields()) {
             if (field.getType() == Column.class) {
+                String name = field.getName();
+                String type = "TEXT";
+                String unique = "";
+                String primaryKey = "";
+                String notNull = "";
+
                 Column column = field.getAnnotation(Column.class);
-                String columnType = column == null ? "TEXT" : column.type().name();
-                String columnName = field.getName();
-                columns.add(columnName + " " + columnType);
+                if (column != null) {
+                    unique = column.unique() ? "UNIQUE" : "";
+                    primaryKey = column.primary() ? "PRIMARY KEY" : "";
+                    notNull = column.notNull() ? "NOT NULL" : "";
+
+                    //autoincrement and primary key order.
+                    if (column.type() == Column.Type.INTEGER_AUTOINC) {
+                        if (column.primary() == true) {
+                            type = "INTEGER PRIMARY KEY AUTOINCREMENT";
+                            primaryKey = "";
+                        } else {
+                            type = "INTEGER AUTOINCREMENT";
+                        }
+                    } else {
+                        type = column.type().name();
+                    }
+                }
+
+                String[] array = {name, type, primaryKey, unique, notNull};
+                columnDefinitions.add(TextUtils.join(" ", array).trim());
             }
         }
 
-        String columnStr = TextUtils.join(",", columns);
+        String columnStr = TextUtils.join(",", columnDefinitions);
         String sql = String.format("CREATE TABLE %s(%s)", name, columnStr);
         return sql;
     }
@@ -46,6 +69,7 @@ public abstract class Table {
         return this.db;
     }
 
+
     protected void delete(String whereClause, String[] whereArgs) {
         getDB().delete(name, whereClause, whereArgs);
     }
@@ -54,8 +78,9 @@ public abstract class Table {
         getDB().insert(name, nullColumnHack, values);
     }
 
-    protected void update( ContentValues values, String whereClause, String[] whereArgs){
-        getDB().update(name,values,whereClause,whereArgs);
+    protected void update(ContentValues values, String whereClause, String[] whereArgs) {
+        getDB().update(name, values, whereClause, whereArgs);
     }
+
 
 }
