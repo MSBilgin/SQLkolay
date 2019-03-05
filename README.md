@@ -70,9 +70,9 @@ public class TableBooks extends Table {
 Thats all...
 
 ``` java
-    AppDB appDB = new AppDB(getApplicationContext());
-    Book book = new Book("Seyahatname", "Evliya Çelebi", "01.01.1600", 2000);
-    appDB.books.add(book);
+AppDB appDB = new AppDB(getApplicationContext());
+Book book = new Book("Seyahatname", "Evliya Çelebi", "01.01.1600", 2000);
+appDB.books.add(book);
 ```
 
 Installation
