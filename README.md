@@ -90,7 +90,7 @@ allprojects {
 on app's build.gradle
 ```groovy
 dependencies {
-    implementation 'com.github.msbilgin:sqlkolay:0.3'
+    implementation 'com.github.msbilgin:sqlkolay:0.4'
 }
 ```
 
