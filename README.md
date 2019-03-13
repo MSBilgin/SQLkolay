@@ -37,6 +37,9 @@ public class TableBooks extends Table {
     @Column(type = Column.Type.REAL)
     private Column price;
 
+    @Column(defval = "'Bilgin'")
+    private Column publisher;
+
     public TableBooks() {
         super(tableName);
     }
