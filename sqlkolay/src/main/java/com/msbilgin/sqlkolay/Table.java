@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Table {
-    public final String name;
+    public final String tableName;
     private SQLiteDatabase db;
 
 
     public Table(String tableName) {
-        this.name = tableName;
+        this.tableName = tableName;
     }
 
     private String sqlCreate() {
@@ -27,12 +27,14 @@ public abstract class Table {
                 String unique = "";
                 String primaryKey = "";
                 String notNull = "";
+                String defVal = "";
 
                 Column column = field.getAnnotation(Column.class);
                 if (column != null) {
                     unique = column.unique() ? "UNIQUE" : "";
                     primaryKey = column.primary() ? "PRIMARY KEY" : "";
                     notNull = column.notNull() ? "NOT NULL" : "";
+                    defVal = column.defval();
 
                     //autoincrement and primary key order.
                     if (column.type() == Column.Type.INTEGER_AUTOINC) {
@@ -44,23 +46,29 @@ public abstract class Table {
                         }
                     } else {
                         type = column.type().name();
+                        defVal = TextUtils.isEmpty(column.defval()) ? "" : "DEFAULT " + defVal;
                     }
                 }
 
-                String[] array = {name, type, primaryKey, unique, notNull};
+                String[] array = {name, type, primaryKey, defVal, unique, notNull};
                 columnDefinitions.add(TextUtils.join(" ", array).trim());
             }
         }
 
         String columnStr = TextUtils.join(",", columnDefinitions);
-        String sql = String.format("CREATE TABLE %s(%s)", name, columnStr);
+        String sql = String.format("CREATE TABLE %s(%s)", tableName, columnStr);
         return sql;
     }
 
     private String sqlDrop() {
-        return "DROP TABLE IF EXISTS " + name;
+        return "DROP TABLE IF EXISTS " + tableName;
     }
 
+    /**
+     * Used for setting Sqlite database. Connection is opened.
+     *
+     * @param db
+     */
     private void setDB(SQLiteDatabase db) {
         this.db = db;
     }
@@ -71,15 +79,15 @@ public abstract class Table {
 
 
     protected void delete(String whereClause, String[] whereArgs) {
-        getDB().delete(name, whereClause, whereArgs);
+        getDB().delete(tableName, whereClause, whereArgs);
     }
 
     protected void insert(String nullColumnHack, ContentValues values) {
-        getDB().insert(name, nullColumnHack, values);
+        getDB().insert(tableName, nullColumnHack, values);
     }
 
     protected void update(ContentValues values, String whereClause, String[] whereArgs) {
-        getDB().update(name, values, whereClause, whereArgs);
+        getDB().update(tableName, values, whereClause, whereArgs);
     }
 
 

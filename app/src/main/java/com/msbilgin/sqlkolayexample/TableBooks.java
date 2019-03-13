@@ -24,6 +24,9 @@ public class TableBooks extends Table {
     @Column(type = Column.Type.REAL)
     private Column price;
 
+    @Column(defval = "'Bilgin'")
+    private Column publisher;
+
     public TableBooks() {
         super(tableName);
     }
@@ -44,7 +47,7 @@ public class TableBooks extends Table {
         Cursor cursor = getDB().rawQuery(sql, null);
         if (cursor.moveToFirst()) {
             book.id = cursor.getInt(cursor.getColumnIndex("id"));
-            book.name = cursor.getString(cursor.getColumnIndex("name"));
+            book.name = cursor.getString(cursor.getColumnIndex("tableName"));
             book.author = cursor.getString(cursor.getColumnIndex("author"));
             book.price = cursor.getDouble(cursor.getColumnIndex("price"));
             book.publishDate = cursor.getString(cursor.getColumnIndex("date"));

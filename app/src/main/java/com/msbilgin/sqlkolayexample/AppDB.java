@@ -6,7 +6,7 @@ import com.msbilgin.sqlkolay.SQLkolay;
 
 public class AppDB extends SQLkolay {
     private static final String databaseName = "app.db";
-    private static final int version = 16;
+    private static final int version = 18;
 
     public TableBooks books = new TableBooks();
 
