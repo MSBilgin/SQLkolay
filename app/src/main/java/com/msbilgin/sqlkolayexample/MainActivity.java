@@ -12,12 +12,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //add a book
-        AppDB appDB = new AppDB(getApplicationContext());
+        AppDB appDB = AppDB.getInstance(getApplicationContext());
         Book book = new Book("Seyahatname", "Evliya Çelebi", "01.01.1600", 2000);
         appDB.books.add(book);
 
         //query
         Log.d("TOTAL BOOKS", String.valueOf(appDB.books.getByAuthor("Evliya").size()));
+
 
     }
 }

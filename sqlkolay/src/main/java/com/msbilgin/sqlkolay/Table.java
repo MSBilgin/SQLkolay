@@ -78,16 +78,16 @@ public abstract class Table {
     }
 
 
-    protected void delete(String whereClause, String[] whereArgs) {
-        getDB().delete(tableName, whereClause, whereArgs);
+    protected int delete(String whereClause, String[] whereArgs) {
+        return getDB().delete(tableName, whereClause, whereArgs);
     }
 
-    protected void insert(String nullColumnHack, ContentValues values) {
-        getDB().insert(tableName, nullColumnHack, values);
+    protected long insert(String nullColumnHack, ContentValues values) {
+        return getDB().insert(tableName, nullColumnHack, values);
     }
 
-    protected void update(ContentValues values, String whereClause, String[] whereArgs) {
-        getDB().update(tableName, values, whereClause, whereArgs);
+    protected int update(ContentValues values, String whereClause, String[] whereArgs) {
+       return getDB().update(tableName, values, whereClause, whereArgs);
     }
 
 

@@ -77,4 +77,6 @@ public class TableBooks extends Table {
     public void remove(int id) {
         delete("id=" + id, null);
     }
+
+
 }
