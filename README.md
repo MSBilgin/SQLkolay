@@ -14,7 +14,7 @@ public class AppDB extends SQLkolay {
     public TableBooks books = new TableBooks();
 
     public AppDB(Context context) {
-        super(context, databaseName, version);
+        super(context, databaseName, version, null);
         registerTables(books);
     }
 }
@@ -93,7 +93,7 @@ allprojects {
 on app's build.gradle
 ```groovy
 dependencies {
-    implementation 'com.github.msbilgin:sqlkolay:0.6'
+    implementation 'com.github.msbilgin:sqlkolay:0.7'
 }
 ```
 

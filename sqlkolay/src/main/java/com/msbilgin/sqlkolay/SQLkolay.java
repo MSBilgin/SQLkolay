@@ -2,22 +2,23 @@ package com.msbilgin.sqlkolay;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import java.lang.reflect.Method;
 
 public abstract class SQLkolay {
+    private final Context context;
     private final int version;
     private final String databaseName;
-    private final Context context;
+    private final UpgradeCallback upgradeCallback;
 
     private boolean isRegistered = false;
 
-    public SQLkolay(Context context, String databaseName, int version) {
+    public SQLkolay(Context context, String databaseName, int version, UpgradeCallback upgradeCallback) {
         this.context = context;
         this.databaseName = databaseName;
         this.version = version;
+        this.upgradeCallback = upgradeCallback;
     }
 
     protected void registerTables(Table... tables) {
@@ -37,15 +38,15 @@ public abstract class SQLkolay {
             return;
         }
 
-        SqliteDB sqliteDB = new SqliteDB(context, databaseName, version, tables);
-        SQLiteDatabase sqLiteDatabase = sqliteDB.getWritableDatabase();
+        DB DB = new DB(context, databaseName, version, upgradeCallback, tables);
+        SQLiteDatabase sqLiteDatabase = DB.getWritableDatabase();
 
-        for (int i = 0; i < tables.length; i++) {
+        for (Table table : tables) {
             try {
-                Class tableClass = tables[i].getClass().getSuperclass();
+                Class tableClass = table.getClass().getSuperclass();
                 Method method = tableClass.getDeclaredMethod("setDB", SQLiteDatabase.class);
                 method.setAccessible(true);
-                method.invoke(tables[i], sqLiteDatabase);
+                method.invoke(table, sqLiteDatabase);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -54,48 +55,7 @@ public abstract class SQLkolay {
         isRegistered = true;
     }
 
+    public void setOnUpgradeCallback(Runnable callback) {
 
-    /**
-     * SQLite class
-     */
-    private class SqliteDB extends SQLiteOpenHelper {
-        private Table[] tables;
-
-        SqliteDB(Context context, String name, int version, Table[] tables) {
-            super(context, name, null, version);
-            this.tables = tables;
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            for (Table table : tables) {
-                try {
-                    Class tableClass = table.getClass().getSuperclass();
-                    Method method = tableClass.getDeclaredMethod("sqlCreate");
-                    method.setAccessible(true);
-                    String sql = (String) method.invoke(table);
-                    db.execSQL(sql);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            for (Table table : tables) {
-                try {
-                    Class tableClass = table.getClass().getSuperclass();
-                    Method method = tableClass.getDeclaredMethod("sqlDrop");
-                    method.setAccessible(true);
-                    String sql = (String) method.invoke(table);
-                    db.execSQL(sql);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            onCreate(db);
-        }
     }
-
 }

@@ -12,7 +12,6 @@ public abstract class Table {
     public final String tableName;
     private SQLiteDatabase db;
 
-
     public Table(String tableName) {
         this.tableName = tableName;
     }
